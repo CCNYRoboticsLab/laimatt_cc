@@ -17,19 +17,20 @@ def segment_pointcloud():
         "-O",
         "-GLOBAL_SHIFT",
         "AUTO",
-        "/home/roboticslab/Developer/laimatt_api/3sections - 170 - 253.las",
+        # "/home/roboticslab/Developer/laimatt_api/3sections - 170 - 253.las",
+        "C:\\Users\\RoboticsLab_NUC#0\\Documents\\GitHub\laimatt_cc\\3sections - 170 - 253.las",
         "-C_EXPORT_FMT",
         "LAS",
         "-EXTRACT_CC",
         "5",
         "20",  # You might need to adjust these parameters
     ]
-    try:
-        result = subprocess.run(cc_command, capture_output=True, text=True, check=True)
-        print("CloudCompare output:\n", result.stdout)
-    except subprocess.CalledProcessError as e:
-        print("CloudCompare error:\n", e.stderr)
-        sys.exit(1)
+    result = subprocess.run(cc_command, capture_output=True, text=True, check=True)
+    # try:
+    #     result = subprocess.run(cc_command, capture_output=True, text=True, check=True)
+    #     print("CloudCompare output:\n", result.stdout)
+    # except subprocess.CalledProcessError as e:
+    #     print("CloudCompare error:\n", e.stderr)
 
 def get_center_point_x(las_file_path):
     with laspy.open(las_file_path) as f:
