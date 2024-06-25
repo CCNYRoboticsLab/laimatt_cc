@@ -1,0 +1,17 @@
+version: '3.8'  # Using a newer version for better compatibility
+
+services:
+  cloudcompare:
+    build:
+      context: .  # Assuming the Dockerfile is in the same directory
+      dockerfile: Dockerfile  # The name of your provided Dockerfile
+    container_name: cloudcompare  # Custom name for your container
+    environment:
+      EXECAPP: "CloudCompare"  # Ensure this matches the Dockerfile setting
+    volumes:
+      - ./data:/CloudCompare/data  # Optional: Mount a data volume for persistence
+      - .:/app
+    entrypoint: /bin/bash /app/run.sh
+    # ports:
+    #   - 8080:8080  # Optional: Expose a port if CloudCompare has a web interface
+
