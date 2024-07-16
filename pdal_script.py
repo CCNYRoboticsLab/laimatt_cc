@@ -19,9 +19,9 @@ def find_nearest_neighbors(points, source_point):
     
     distances, indices = nbrs.kneighbors(points)
     
-    print(points)
-    print(indices)
-    print(distances)
+    # print(points)
+    # print(indices)
+    # print(distances)
     
     nearest_path = [source_point]
     current_point = source_point
@@ -35,8 +35,8 @@ def find_nearest_neighbors(points, source_point):
         distances, indices = nbrs.kneighbors([current_point])
         next_closest = 1
         next_index = indices[0][next_closest]
-        print(indices)
-        print("next " + str(next_index))
+        # print(indices)
+        # print("next " + str(next_index))
         
         # If the point is already visited, continue searching
         while tuple(points[next_index]) in visited:
@@ -52,20 +52,63 @@ def find_nearest_neighbors(points, source_point):
 
     return nearest_path
 
-def csv_to_asc(csv_file, asc_file):
+def csv_to_asc(csv_file, las_file, asc_file):
     # Read the CSV file
     df = pd.read_csv(csv_file, header=None)
 
     # Extract the first three rows (x, y, z)
     np_coords = numpy.round((pd.DataFrame(df.iloc[1:, :3]).to_numpy(dtype=numpy.float64)), 3)
+    
+    nearestToCorner(box_corners(las_file), np_coords)
+    
     nearest_neighbors_path = find_nearest_neighbors(np_coords, np_coords[0])
-    print(nearest_neighbors_path)
+    # print(nearest_neighbors_path)
 
     # Open the ASC file for writing
     with open(asc_file, 'w') as f:
         for index in nearest_neighbors_path:
             # Join x, y, z with a space and write to the ASC file
             f.write(f"{index[0]} {index[1]} {index[2]}\n")
+            
+def nearestToCorner(corners, points):
+    
+    ptsWcorners = numpy.concatenate((corners, points), axis = 0)
+    print(ptsWcorners)
+    
+    nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(ptsWcorners)
+    
+    distances, indices = nbrs.kneighbors(ptsWcorners)
+    
+    boxpoints = numpy.concatenate((indices, distances), axis = 1)
+    min_point = index(min(boxpoints[:8, 3]))
+    print(min_point)
+    
+    print(boxpoints)
+
+def box_corners(las_file):
+    b = bounding_box_info(las_file)
+    
+    center = [b[0], b[1], b[2]]
+    
+    # Calculate half dimensions
+    half_length = b[3] / 2
+    half_width = b[4] / 2
+    half_height = b[5] / 2
+
+    # Create corners based on center
+    corners = numpy.array([
+        [center[0] - half_length, center[1] - half_width, center[2] - half_height],
+        [center[0] + half_length, center[1] - half_width, center[2] - half_height],
+        [center[0] + half_length, center[1] + half_width, center[2] - half_height],
+        [center[0] - half_length, center[1] + half_width, center[2] - half_height],
+        [center[0] - half_length, center[1] - half_width, center[2] + half_height],
+        [center[0] + half_length, center[1] - half_width, center[2] + half_height],
+        [center[0] + half_length, center[1] + half_width, center[2] + half_height],
+        [center[0] - half_length, center[1] + half_width, center[2] + half_height],
+    ])
+
+    return numpy.round(corners, 3)
+    
 
 
 def csvToLas(test_dir, test_index, length):
@@ -90,7 +133,8 @@ def csvToLas(test_dir, test_index, length):
         ]
         result = subprocess.run(command, capture_output=True, text=True, check=True)
         
-        csv_to_asc(csv_file, asc_file)
+        if x == 1: csv_to_asc(csv_file, las_file, asc_file)
+        # csv_to_asc(csv_file, las_file, asc_file)
 
 def lasToCsv(test_dir, min_p, tolerance, max_p, file_name):
     # pdal = "/home/roboticslab/Developer/laimatt/laimatt_pdal/.conda/bin/pdal"
