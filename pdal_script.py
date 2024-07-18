@@ -145,13 +145,13 @@ class PointCloudPostProcessor:
         # print(np_coords)
         # print()
         
-        source = self.nearestToCorner(self.box_corners(las_file, clusters[index]), np_coords) - 8
+        source = self.nearestToCorner(self.box_corners(las_file, clusters[index]), np_coords)
         
         # print(source)
         # print(np_coords[source])
         
         nearest_neighbors_path = self.find_nearest_neighbors(np_coords, np_coords[source])
-        # print(nearest_neighbors_path)
+        print(nearest_neighbors_path)
 
         if not self.training:
             # Open the ASC file for writing
@@ -162,31 +162,26 @@ class PointCloudPostProcessor:
                     
         path = numpy.empty
         for index in nearest_neighbors_path:
-            print((index[0], index[1], index[2]))
-            numpy.append(path, (index[0], index[1], index[2]))
+            print(numpy.array(index))
+            numpy.append(path, numpy.array(index))
         return path
                 
     def nearestToCorner(self, corners, points):
-        print("separate")
-        print(corners)
-        print(points)
         ptsWcorners = numpy.concatenate((corners, points), axis = 0)
-        print("composite")
-        print(ptsWcorners)
         
         nbrs = NearestNeighbors(n_neighbors=2, algorithm='ball_tree').fit(ptsWcorners)
         distances, indices = nbrs.kneighbors(corners)
-        print(indices)
-        
         boxpoints = numpy.concatenate((indices, distances), axis = 1)
-        print(boxpoints)
-        min_point = int(numpy.squeeze(numpy.where(boxpoints == min(boxpoints))[0]))
+        min_point = int(numpy.squeeze(numpy.where(boxpoints[:8, 3] == min(boxpoints[:8, 3]))[0]))
         
-        print(boxpoints)
-        print(boxpoints[:8, 3])
-        print(boxpoints[min_point][1])
+        # print(boxpoints)
+        # print(boxpoints[:8, 3])
+        # print(boxpoints[min_point][1])
         
-        return int(boxpoints[min_point][1])
+        if boxpoints[min_point][1] < 8:
+            return int(boxpoints[min_point][0]) - 8
+        
+        return int(boxpoints[min_point][1]) - 8
 
     def box_corners(self, las_file, points):
         if not self.training:
@@ -391,6 +386,6 @@ def download(project_id, task_id, filename):
     return send_file(os.path.join(uploads, filename), as_attachment=True)
 
 
-ppp = PointCloudPostProcessor(False)
+ppp = PointCloudPostProcessor(True)
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=2001, debug=True)
