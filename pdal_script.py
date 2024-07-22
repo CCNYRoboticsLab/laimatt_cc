@@ -96,7 +96,7 @@ class PointCloudPostProcessor:
             
             if not self.training: csvoutput.close()
             
-        print(cluster_list)
+        print(cluster_list[6])
         return cluster_list
     
     def csvToLas(self, test_dir, test_index, clusters):
@@ -122,14 +122,14 @@ class PointCloudPostProcessor:
                 ]
                 result = subprocess.run(command, capture_output=True, text=True, check=True)
                 self.csv_to_asc(csv_file, las_file, asc_file, clusters, x)
+                # if x == 1: self.csv_to_asc(csv_file, las_file, asc_file, clusters, x)
             
                 
-            
-            # if x == 1: csv_to_asc(csv_file, las_file, asc_file)
-        
+                    
         line_list = []
         for index in range(len(clusters)):
             line_list.append(self.csv_to_asc(csv_file, las_file, asc_file, clusters, index))
+            # if index == 6: line_list.append(self.csv_to_asc(csv_file, las_file, asc_file, clusters, index))
         return line_list
     
     def csv_to_asc(self, csv_file, las_file, asc_file, clusters, index):
@@ -160,11 +160,14 @@ class PointCloudPostProcessor:
                     # Join x, y, z with a space and write to the ASC file
                     f.write(f"{index[0]} {index[1]} {index[2]}\n")
                     
-        path = numpy.empty
+        path = []
         for index in nearest_neighbors_path:
             print(numpy.array(index))
-            numpy.append(path, numpy.array(index))
-        return path
+            path.append(numpy.array(index))
+            
+        print(path)
+        print(numpy.asarray(path))
+        return numpy.asarray(path)
                 
     def nearestToCorner(self, corners, points):
         ptsWcorners = numpy.concatenate((corners, points), axis = 0)
@@ -262,7 +265,7 @@ class PointCloudPostProcessor:
             width = round((y_max - y_min), 3)
             height = round((z_max - z_min), 3)
             
-            print([center_x, center_y, center_z, length, width, height])
+            # print([center_x, center_y, center_z, length, width, height])
             
             return [center_x, center_y, center_z, length, width, height]
     
@@ -278,7 +281,7 @@ class PointCloudPostProcessor:
         width = round((y_max - y_min), 3)
         height = round((z_max - z_min), 3)
         
-        print([center_x, center_y, center_z, length, width, height])
+        # print([center_x, center_y, center_z, length, width, height])
         
         return [center_x, center_y, center_z, length, width, height]
         
