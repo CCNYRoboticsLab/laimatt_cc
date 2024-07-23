@@ -96,7 +96,7 @@ class PointCloudPostProcessor:
             
             if not self.training: csvoutput.close()
             
-        print(cluster_list[6])
+        # print(cluster_list[6])
         return cluster_list
     
     def csvToLas(self, test_dir, test_index, clusters):
@@ -358,19 +358,19 @@ class PointCloudPostProcessor:
 
 @app.route('/components', methods=['GET'])
 def components_api():
-    project_id = 151
-    task_id = "c9c7deff-e46b-4ed5-8316-79ddf9d19352"
+    project_id = 99
+    task_id = "aa"
     uid = 12
     color = 2
-    min_p = 4
-    tolerance = .65
+    min_p = 10
+    tolerance = .2
     max_p = 10000
     
     folder_path = 'tasks/task_{}_{}/'.format(project_id, task_id)
     test_path = os.path.join(folder_path, "training" if ppp.training else "tests")
         
     # file_name = os.path.join(folder_path, '{}_filtered_model.las'.format(getName(TypeColor, color)))
-    file_name = "3sections - 170 - 253.las"        
+    file_name = "blue.las"        
     if not (os.path.exists(test_path)):
         os.makedirs(os.path.join(test_path))
             
@@ -389,6 +389,6 @@ def download(project_id, task_id, filename):
     return send_file(os.path.join(uploads, filename), as_attachment=True)
 
 
-ppp = PointCloudPostProcessor(True)
+ppp = PointCloudPostProcessor(False)
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=2001, debug=True)
