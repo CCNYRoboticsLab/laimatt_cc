@@ -324,7 +324,7 @@ class PointCloudPostProcessor:
         
         for filepath in filepaths[1:]:
             b = self.bounding_box_info(filepath)
-            link = f"https://laimatt.boshang.online/download/{str(project_id) }/" + task_id + "/" + os.path.basename(filepath)
+            link = f"https://laimatt.boshang.online/download/{str(project_id) }/" + getName(TypeColor, color) + "/" + os.path.basename(filepath)
             
             query = "INSERT INTO patch_crack (center_lat, center_long, center_alt, box_length, box_width, box_height, type, las_link, whole_data_id) " + \
                 "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', %s, %s, %s)"
@@ -346,15 +346,14 @@ class PointCloudPostProcessor:
             
     def create_components(self, project_id, task_id, uid, color, min_p, tolerance, max_p, subsample, file_name, test_path): 
         
-            
         test_dir = os.path.join(test_path, (f'{getName(TypeColor, color)}_test_{min_p}_{tolerance}_{max_p}'))
         # test_dir = os.path.join(test_path, ("test_" + str(min_p) + "_" + str(tolerance) + "_" + str(max_p)))
+        
         test_index = f"{str(min_p)}_{str(tolerance)}_{str(max_p)}"
         if os.path.exists(test_dir):
             print(test_dir + " already exists, remaking", flush=True)
             shutil.rmtree(test_dir)
         os.makedirs(test_dir)
-
 
         self.lasToCsv(test_dir, min_p, tolerance, max_p, subsample, file_name)
         clusters = self.create_csvs(test_dir)
@@ -378,7 +377,7 @@ def components_api():
     max_p = 10000
     subsample = .2
     
-    folder_path = f'tasks/task_{project_id}_{task_id}/'
+    folder_path = f'tasks/projID_{project_id}/'
     test_path = os.path.join(folder_path, "training" if ppp.training else "tests")
         
     # file_name = os.path.join(folder_path, '{}_filtered_model.las'.format(getName(TypeColor, color)))
@@ -406,7 +405,6 @@ def download(project_id, task_id, filename):
     # Use send_file function to send the file
     return send_file(os.path.join(uploads, filename), as_attachment=True)
 
-
-ppp = PointCloudPostProcessor(True)
+ppp = PointCloudPostProcessor(False)
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=2001, debug=True)
