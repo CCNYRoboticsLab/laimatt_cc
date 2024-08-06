@@ -185,7 +185,7 @@ class PointCloudPostProcessor:
         distances, indices = nbrs.kneighbors(corners)
         boxpoints = numpy.concatenate((indices, distances), axis = 1)
         
-        print(numpy.where(boxpoints[:8, 3] == min(boxpoints[:8, 3]))[0][0])
+        # print(numpy.where(boxpoints[:8, 3] == min(boxpoints[:8, 3]))[0][0])
         # min_point = int(numpy.squeeze(numpy.where(boxpoints[:8, 3] == min(boxpoints[:8, 3]))[0]))
         min_point = numpy.where(boxpoints[:8, 3] == min(boxpoints[:8, 3]))[0][0]
         
@@ -318,20 +318,23 @@ class PointCloudPostProcessor:
         cursor = mydb.cursor()
         cursor.execute("USE sample")
         
+        cursor.execute("SELECT * FROM patch_crack")
+        print(cursor.fetchall())
+        
         filepaths = sorted(glob.iglob(test_dir + '/component_las_' + test_index + '/*'))
         # next(iter(sorted(glob.iglob(test_dir + '/component_las_' + test_index + '/*'))))
         # filepaths = next(iter(sorted(glob.iglob(test_dir + '/component_las_' + test_index + '/*'))))
         
-        for filepath in filepaths[1:]:
-            b = self.bounding_box_info(filepath)
-            link = f"https://laimatt.boshang.online/download/{str(project_id) }/" + getName(TypeColor, color) + "/" + os.path.basename(filepath)
+        # for filepath in filepaths[1:]:
+        #     b = self.bounding_box_info(filepath)
+        #     link = f"https://laimatt.boshang.online/download/{str(project_id) }/" + getName(TypeColor, color) + "/" + os.path.basename(filepath)
             
-            query = "INSERT INTO patch_crack (center_lat, center_long, center_alt, box_length, box_width, box_height, type, las_link, whole_data_id) " + \
-                "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', %s, %s, %s)"
-            data = (b[0], b[1], b[2], b[3], b[4], b[5], color, link, uid)
-            # print(query, data)
-            cursor.execute(query, data)
-            mydb.commit()
+        #     query = "INSERT INTO patch_crack (center_lat, center_long, center_alt, box_length, box_width, box_height, type, las_link, whole_data_id) " + \
+        #         "VALUES ('%s', '%s', '%s', '%s', '%s', '%s', %s, %s, %s)"
+        #     data = (b[0], b[1], b[2], b[3], b[4], b[5], color, link, uid)
+        #     # print(query, data)
+        #     cursor.execute(query, data)
+        #     mydb.commit()
 
         mydb.close()    
         
@@ -362,7 +365,7 @@ class PointCloudPostProcessor:
         print(result)
         
         if not self.training:
-            # self.populate_db(test_dir, test_index, uid, project_id, task_id, color)
+            self.populate_db(test_dir, test_index, uid, project_id, task_id, color)
             self.populate_csv(test_dir, test_index)
         return "success"
 
